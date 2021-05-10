@@ -2,6 +2,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const NODE_ENV = process.env.NODE_ENV;
+const GLOBAL_CSS_REGEXP = /index.scss/;
 
 module.exports = {
   mode: NODE_ENV ? NODE_ENV : "development",
@@ -16,6 +17,33 @@ module.exports = {
         test: /\.[tj]sx?$/,
         use: ["ts-loader"],
       },
+      {
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          { loader: "style-loader" },
+          {
+            loader: "css-loader",
+            options: {
+              modules: {
+                mode: "local",
+                localIdentName: "[name]__[local]--[hash:base64:5]",
+              },
+            },
+          },
+          { loader: "postcss-loader" },
+          {
+            loader: "sass-loader",
+            options: {
+              implementation: require("sass"),
+            },
+          },
+        ],
+        exclude: GLOBAL_CSS_REGEXP,
+      },
+      {
+        test: GLOBAL_CSS_REGEXP,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   plugins: [
@@ -29,7 +57,7 @@ module.exports = {
   },
   devServer: {
     port: 3000,
-    open: true,
+    open: false,
     hot: true,
   },
 };
