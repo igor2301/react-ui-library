@@ -1,6 +1,4 @@
-const path = require("path");
-
-const GLOBAL_CSS_REGEXP = /index.scss/;
+const webpackReference = require("../webpack.config");
 
 module.exports = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
@@ -9,38 +7,31 @@ module.exports = {
     builder: "webpack5",
   },
   webpackFinal: async (config) => {
-    config.module.rules.push({
-      test: /\.(sa|sc|c)ss$/,
-      use: [
-        { loader: "style-loader" },
-        {
-          loader: "css-loader",
-          options: {
-            modules: {
-              mode: "local",
-              localIdentName: "[name]__[local]--[hash:base64:5]",
-            },
-          },
-        },
-        { loader: "postcss-loader" },
-        {
-          loader: "sass-loader",
-          options: {
-            implementation: require("sass"),
-          },
-        },
-      ],
-      exclude: GLOBAL_CSS_REGEXP,
-      include: path.resolve(__dirname, "../"),
-    });
-    config.module.rules.push({
-      test: GLOBAL_CSS_REGEXP,
-      use: ["style-loader", "css-loader"],
-    });
+    const scssRule = webpackReference.module.rules.find(({ test }) =>
+      test.test(".scss")
+    );
+    config.module.rules.unshift(scssRule);
+
+    const svgRule = webpackReference.module.rules.find((rule) =>
+      rule.test.test(".svg")
+    );
+
+    const fileLoaderRule = config.module.rules.find((rule) =>
+      rule.test.test(".svg")
+    );
+    fileLoaderRule.exclude = /\.svg$/;
+    config.module.rules.push(svgRule);
+
     config.resolve.fallback = {
       crypto: false,
       path: false,
     };
+
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      ...webpackReference.resolve.alias,
+    };
+
     return config;
   },
 };

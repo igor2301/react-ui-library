@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const NODE_ENV = process.env.NODE_ENV;
 const GLOBAL_CSS_REGEXP = /index.scss/;
+const sourcePath = path.resolve(__dirname, "src");
 
 module.exports = {
   mode: NODE_ENV ? NODE_ENV : "development",
@@ -44,6 +45,20 @@ module.exports = {
         test: GLOBAL_CSS_REGEXP,
         use: ["style-loader", "css-loader"],
       },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: "babel-loader",
+          },
+          {
+            loader: "react-svg-loader",
+            options: {
+              jsx: true,
+            },
+          },
+        ],
+      },
     ],
   },
   plugins: [
@@ -54,6 +69,9 @@ module.exports = {
   ],
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
+    alias: {
+      "@src": sourcePath,
+    },
   },
   devServer: {
     port: 3000,

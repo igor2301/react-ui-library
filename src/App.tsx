@@ -1,10 +1,11 @@
 import * as React from "react";
-import Input from "./components/Input";
+import SvgIcon from "./components/SvgIcon";
+import { Icon } from "./components/SvgIcon/SvgIcon";
 
 export function App() {
   return (
     <h1>
-      <Input></Input>
+      <SvgIcon name={Icon.Arrow}></SvgIcon>
     </h1>
   );
 }
